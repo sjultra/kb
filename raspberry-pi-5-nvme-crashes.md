@@ -42,6 +42,8 @@ The parts for this build, with purchase links. Prices are as listed on the Centr
 
 **Note on PoE power:** A Pi 5 under load needs an 802.3at (PoE+) port delivering up to 25W. Plain 802.3af ports (15.4W) are not enough for a Pi 5. Confirm the switch PoE budget covers all PoE devices on it (the UDR7 has a 15.4W PoE budget on its single PoE port; the USW-LITE-8-POE has a 52W budget across 4 PoE+ ports).
 
+Example of the switch and mini rack type: the [Central Computer event recap — ASUS Ascent GX10 mini-rack](https://www.centralcomputer.com/blog/post/asus-x-nvidia-x-central-computers-%7C-event-recap#ascent-gx10) shows a Ubiquiti 10G PoE switch in a 10-inch mini rack — an example of the type of switch and mini rack that could be used.
+
 ## The troubles
 
 ### Affected store Pi: NVMe drops off the PCIe bus
