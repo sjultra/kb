@@ -27,17 +27,17 @@ These Pis are the [FlexPondi Pi5](https://www.portalrobotics.com/flexpondi-pi5.h
 
 ## Parts
 
-The parts for this build, with purchase links. Prices are as listed on the Central Computer Store on November 11, 2026; availability changes, so confirm before ordering.
+The parts for this build, with purchase links. Prices are as listed on the Central Computer Store on November 11, 2026; availability changes, so confirm before ordering. Where the exact part is not stocked, the in-stock substitute is linked instead.
 
 | Part | Role | Purchase |
 | --- | --- | --- |
 | Raspberry Pi 5 | The K3s node at each store | — |
-| WD Black SN770 500GB (WDS500G3X0E) | The drive in the affected store — **not recommended** (incompatible with Pi 5, see root cause) | Not currently listed at the Central Computer Store (only the SN770M 2230 variant) |
-| WD Black SN7100 500GB (WDS500G4X0E) | The Pi 5-proven replacement drive (runs clean at the control store) | Not currently listed at the Central Computer Store in 500GB (1TB and 4TB are listed) |
-| Raspberry Pi PoE+ HAT (Pi 5) | Powers the Pi over the network cable (802.3at PoE+, up to 25W) | Not currently listed at the Central Computer Store (only a third-party Geekworm PoE HAT) |
+| WD Black SN770 500GB (WDS500G3X0E) | The drive in the affected store — **not recommended** (incompatible with Pi 5, see root cause) | Not currently listed at the Central Computer Store; the SN770M 500GB variant is special order (out of stock) |
+| WD Black SN7100 500GB (WDS500G4X0E) | The Pi 5-proven replacement drive (runs clean at the control store) | Substitute the in-stock 1TB model: [Central Computer Store — $189.99](https://www.centralcomputer.com/western-digital-wds100t4x0e-wd-black-1tb-sn7100nvme-internal-ssd-pcie-gen-4-m-2-2280-72500mb-s-reads.html) |
+| Raspberry Pi PoE+ HAT (Pi 5) | Powers the Pi over the network cable (802.3at PoE+, up to 25W) | Substitute the in-stock Geekworm Pi 5 PoE HAT (X1200-A1): [Central Computer Store — $24.95](https://www.centralcomputer.com/geekworm-raspberry-pi-5-poe-hat-support-802-3af-at-with-pd-trigger-activation-type-c-power-black.html) |
 | Cat6 Ethernet patch cable, 7 ft, blue | Connects the Pi to the switch (carries data + PoE power) | [Central Computer Store — $4.95](https://www.centralcomputer.com/cat6-straight-patch-550mhz-utp-cable-7-blue.html) |
 | Ubiquiti USW-LITE-8-POE | PoE switch — 8 ports, 52W PoE budget, 4x PoE+ ports; adequate PoE power for Pi 5 nodes | [Central Computer Store — $119.99](https://www.centralcomputer.com/ubiquiti-usw-lite-8-poe-unifi-switch-lite-8-portpoe-switch-8x-rj45-802-3at-poe-52w-max.html) |
-| UniFi Dream Machine (UDM) | Cloud gateway / UniFi console for a store | Not currently listed at the Central Computer Store (UDM-PRO and UDM-SE are listed) |
+| UniFi Dream Machine (UDM) | Cloud gateway / UniFi console for a store | Substitute the in-stock UDM-PRO (1U rackmount): [Central Computer Store — $415.99](https://www.centralcomputer.com/ubiquiti-udm-pro-unifi-dream-machine-pro-1u-rackmount-8-port-switch-10gbps-3-5in-hdd-expansion.html) |
 | UniFi Dream Router 7 (UDR7) | Cloud gateway / UniFi console for a store — WiFi 7, 4x 2.5GbE ports (1 PoE), 10G SFP+ WAN | [Central Computer Store — $299.99](https://www.centralcomputer.com/ubiquiti-udr7-us-dream-router-wifi-7-4-port-switch.html) |
 
 **Note on PoE power:** A Pi 5 under load needs an 802.3at (PoE+) port delivering up to 25W. Plain 802.3af ports (15.4W) are not enough for a Pi 5. Confirm the switch PoE budget covers all PoE devices on it (the UDR7 has a 15.4W PoE budget on its single PoE port; the USW-LITE-8-POE has a 52W budget across 4 PoE+ ports).
