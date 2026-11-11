@@ -16,11 +16,31 @@ Three more Pis are offline with no remote telemetry. Recovery is remote: the Uni
 
 Each store runs a single Raspberry Pi 5 as its K3s node. The Pi is the only control-plane and etcd node for that store's cluster, so a Pi outage takes that store's control plane down (workloads keep running until they need the API).
 
+These Pis are the [FlexPondi Pi5](https://www.portalrobotics.com/flexpondi-pi5.html) edge appliance from [Portal Robotics](https://www.portalrobotics.com/) — a compact appliance that connects each location to the VS Platform control plane for deployment, security, monitoring, and management. The FlexPondi Pi5 is part of the Portal Robotics FlexPondi Toolkit.
+
 - **Hardware:** Raspberry Pi 5, PoE hat (power over the network cable), NVMe SSD on a PCIe M.2 HAT.
 - **Storage:** The affected store uses a WD Black SN770 500GB (DRAM-less design, uses Host Memory Buffer). The control store uses a WD Black SN7100 500GB.
 - **Software:** Linux with K3s (Kubernetes). The Pis are managed through Salt for remote telemetry and maintenance.
 - **Sites:** Five stores — one Pi per store.
 - **Power:** PoE, so a hung Pi can be power-cycled remotely by toggling its switch port (see Recovery below).
+- **Monitoring:** The [UniFi Monitor](https://github.com/sjultra/unifi-monitor) (open source, SJULTRA) monitors the UniFi network devices, detects when a Pi goes offline, and power-cycles the PoE port to bring it back online.
+
+## Parts
+
+The parts for this build, with purchase links. Prices are as listed on the Central Computer Store on November 11, 2026; availability changes, so confirm before ordering.
+
+| Part | Role | Purchase |
+| --- | --- | --- |
+| Raspberry Pi 5 | The K3s node at each store | — |
+| WD Black SN770 500GB (WDS500G3X0E) | The drive in the affected store — **not recommended** (incompatible with Pi 5, see root cause) | Not currently listed at the Central Computer Store (only the SN770M 2230 variant) |
+| WD Black SN7100 500GB (WDS500G4X0E) | The Pi 5-proven replacement drive (runs clean at the control store) | Not currently listed at the Central Computer Store in 500GB (1TB and 4TB are listed) |
+| Raspberry Pi PoE+ HAT (Pi 5) | Powers the Pi over the network cable (802.3at PoE+, up to 25W) | Not currently listed at the Central Computer Store (only a third-party Geekworm PoE HAT) |
+| Cat6 Ethernet patch cable, 7 ft, blue | Connects the Pi to the switch (carries data + PoE power) | [Central Computer Store — $4.95](https://www.centralcomputer.com/cat6-straight-patch-550mhz-utp-cable-7-blue.html) |
+| Ubiquiti USW-LITE-8-POE | PoE switch — 8 ports, 52W PoE budget, 4x PoE+ ports; adequate PoE power for Pi 5 nodes | [Central Computer Store — $119.99](https://www.centralcomputer.com/ubiquiti-usw-lite-8-poe-unifi-switch-lite-8-portpoe-switch-8x-rj45-802-3at-poe-52w-max.html) |
+| UniFi Dream Machine (UDM) | Cloud gateway / UniFi console for a store | Not currently listed at the Central Computer Store (UDM-PRO and UDM-SE are listed) |
+| UniFi Dream Router 7 (UDR7) | Cloud gateway / UniFi console for a store — WiFi 7, 4x 2.5GbE ports (1 PoE), 10G SFP+ WAN | [Central Computer Store — $299.99](https://www.centralcomputer.com/ubiquiti-udr7-us-dream-router-wifi-7-4-port-switch.html) |
+
+**Note on PoE power:** A Pi 5 under load needs an 802.3at (PoE+) port delivering up to 25W. Plain 802.3af ports (15.4W) are not enough for a Pi 5. Confirm the switch PoE budget covers all PoE devices on it (the UDR7 has a 15.4W PoE budget on its single PoE port; the USW-LITE-8-POE has a 52W budget across 4 PoE+ ports).
 
 ## The troubles
 
@@ -100,3 +120,5 @@ A PCIe link setting (`dtparm=pciex1_no_l0s`) was added to the Pi boot configurat
 - Pi 5 vendor incompatibility list (Geekworm) — lists the WD Black SN770 as incompatible with the Pi 5.
 - OpenZFS discussion #14793 — documents the same controller-down signature for the SN770 on this firmware version.
 - WD Black SN770 firmware 731120WD — latest build for the 500GB model (vendor download repository).
+- [FlexPondi Pi5](https://www.portalrobotics.com/flexpondi-pi5.html) — the edge appliance these Pis are, from Portal Robotics.
+- [UniFi Monitor](https://github.com/sjultra/unifi-monitor) — open-source UniFi network monitoring (SJULTRA).
