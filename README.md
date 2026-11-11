@@ -4,8 +4,8 @@ Public knowledge base for SJULTRA infrastructure, builds, and troubleshooting. P
 
 ## Pages
 
-- [Central Computer Raspberry Pi 5 NVMe Crashes — Build, Troubles, Troubleshooting](central-computer-raspberry-pi-nvme-crashes.md) — How the Central Computer Raspberry Pi 5 K3s nodes were built, the NVMe crashes, and the troubleshooting and fixes so far.
+- [Raspberry Pi 5 NVMe Crashes — Build, Troubles, Troubleshooting](raspberry-pi-5-nvme-crashes.md) — How Raspberry Pi 5 K3s nodes at a retail client's stores were built, the NVMe crashes, and the troubleshooting and fixes so far.
 
 ## Contributing
 
-Pages follow BLUF format (summary at the top, details after). Public pages contain no IP addresses, serial numbers, or other specific infrastructure identifiers.
+Pages follow BLUF format (summary at the top, details after). Public pages contain no client names, no IP addresses, no serial numbers, and no other specific infrastructure identifiers.
