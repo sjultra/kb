@@ -1,6 +1,6 @@
 # Raspberry Pi 5 NVMe Crashes — Build, Troubles, Troubleshooting
 
-> **Living document.** Last updated November 11, 2026. This page is updated as the investigation and the fixes progress. See the Current status section for the latest verdict.
+> **Living document.** Last updated November 12, 2026. This page is updated as the investigation and the fixes progress. See the Current status section for the latest verdict.
 
 ## Summary
 
@@ -8,9 +8,9 @@ Five Raspberry Pi 5 nodes run K3s at a retail client's store locations. Each Pi 
 
 One store's Pi crashes every 2–8 hours: the NVMe drive drops off the PCIe bus, followed by K3s timeout errors. The root cause is a drive-model incompatibility — the WD Black SN770 is on the Pi 5 vendor incompatibility list — not bad flash, not power, and not a Pi firmware bug.
 
-Three fixes were applied on November 11, 2026: the Pi bootloader was updated from the May 8, 2025 release to the December 8, 2025 release, the SN770 firmware was updated from 731100WD (built June 8, 2022) to 731120WD (built October 15, 2023), and a PCIe link setting (`dtparm=pciex1_no_l0s`) was added. The drops recurred after all three fixes — four controller-down events on November 11 (09:29, 10:12, 10:20, 10:44 PST) — so the fixes did not hold. The drive is faulty or incompatible with the Pi 5. Replacement with a Pi 5-proven model (the WD Black SN7100, which runs clean at a second store) is approved and is the next step. A 10-minute drop watch monitors until the drive is replaced.
+Three fixes were applied on November 11, 2026: the Pi bootloader was updated from the May 8, 2025 release to the December 8, 2025 release, the SN770 firmware was updated from 731100WD (built June 8, 2022) to 731120WD (built October 15, 2023), and a PCIe link setting (`dtparm=pciex1_no_l0s`) was added. Drops recurred after the fixes — 13 controller-down events in total through November 12 — so the low-cost fixes did not hold. The drive is faulty or incompatible with the Pi 5. The next step is replacing the drive with a Pi 5-proven model (the WD Black SN7100, which runs clean at a second store); the replacement plan is drafted and awaiting approval. A health-gated watchdog now monitors the affected store Pi: it waits after a drop and only power-cycles the PoE port if the drive or cluster is still unhealthy.
 
-Three more Pis are offline with no remote telemetry. Recovery is remote: the UniFi monitoring tool detects the offline Pi, identifies its switch port, and power-cycles the PoE port to bring it back online. No site visit is needed — remote PoE power-cycle is why the Pis use PoE.
+Two more Pis are offline with no remote telemetry, and their site switches are currently unreachable from the UniFi controller, so remote power-cycling is blocked for those two until controller connectivity returns. For the affected store Pi, automatic PoE power-cycling is now live: a health-gated watchdog power-cycles the port only when a drop leaves the drive or cluster unhealthy. No site visit is needed for the affected store — remote PoE power-cycle is why the Pis use PoE.
 
 ## How the Pis were built
 
@@ -23,7 +23,7 @@ These Pis are the [FlexPondi Pi5](https://www.portalrobotics.com/flexpondi-pi5.h
 - **Software:** Linux with K3s (Kubernetes). The Pis are managed through Salt for remote telemetry and maintenance.
 - **Sites:** Five stores — one Pi per store.
 - **Power:** PoE, so a hung Pi can be power-cycled remotely by toggling its switch port (see Recovery below).
-- **Monitoring:** The [UniFi Monitor](https://github.com/sjultra/unifi-monitor) (open source, SJULTRA) monitors the UniFi network devices, detects when a Pi goes offline, and power-cycles the PoE port to bring it back online.
+- **Monitoring:** The [UniFi Monitor](https://github.com/sjultra/unifi-monitor) (open source, SJULTRA) monitors the UniFi network devices. A health-gated watchdog built on it power-cycles the affected store Pi's PoE port when a drive drop leaves the drive or cluster unhealthy; it does not cycle Pis at sites whose switches the controller cannot reach.
 
 ## Parts
 
@@ -50,15 +50,15 @@ Example of the switch and mini rack type: the [Central Computer event recap — 
 
 The affected store Pi's NVMe drive repeatedly drops off the PCIe bus. The kernel reports the controller is down and resets it. Each drop is followed within seconds by K3s timeout errors (a downstream symptom, not the cause).
 
-- **Frequency:** 12 controller-down events from November 9–11, 2026, roughly every 2–8 hours — including 4 on November 11 after all three low-cost fixes were applied.
+- **Frequency:** 13 controller-down events from November 9–12, 2026 (12 on November 11, one more on November 12), roughly every 2–8 hours — including 4 on November 11 after all three low-cost fixes were applied.
 - **Symptom:** The drive disappears from the PCIe bus, the controller resets, and K3s reports timeouts until the drive comes back.
 - **Impact:** The store's K3s control plane is interrupted each time the drive drops.
 
-### Three Pis offline with no telemetry
+### Two Pis offline with no telemetry
 
-Three of the five Pis are unreachable and have no remote management enrollment. No telemetry exists for them, so their drive models, firmware versions, and health are unknown.
+Two of the five Pis are unreachable and have no remote management enrollment. No telemetry exists for them, so their drive models, firmware versions, and health are unknown. Their site switches are currently unreachable from the UniFi controller, so remote power-cycling is blocked for those two until controller connectivity returns.
 
-Recovery does not need a site visit. The Pis use Power-over-Ethernet precisely so they can be power-cycled remotely: the UniFi monitoring tool detects when a Pi goes offline, identifies the Ethernet port on the UniFi switch the Pi is connected to, and power-cycles that PoE port to bring the Pi back online.
+For the affected store Pi, recovery does not need a site visit. The Pis use Power-over-Ethernet precisely so they can be power-cycled remotely: a health-gated watchdog detects when the Pi's drive drops, waits to see if it recovers on its own, and power-cycles the PoE port only if the drive or cluster is still unhealthy.
 
 ### Control store Pi: healthy control case
 
@@ -103,19 +103,19 @@ The old firmware (731100WD) was built June 8, 2022 — over four years old at th
 
 A PCIe link setting (`dtparm=pciex1_no_l0s`) was added to the Pi boot configuration. This is a documented workaround for drives that drop off the PCIe bus. It is low-risk and reversible (remove the one line and reboot). It was applied in the same window because the firmware alone was unproven and the observation window after the bootloader update alone was only minutes (drops occur every 2–8 hours).
 
-## Current status (November 11, 2026)
+## Current status (November 12, 2026)
 
-- **Affected store Pi:** All three low-cost fixes were applied and verified, but the drops recurred. Four controller-down events on November 11 after the fixes (09:29, 10:12, 10:20, 10:44 PST). The Pi stayed up through all four drops (no reboot). Verdict: the fixes did not hold. The drive is faulty or essentially incompatible with the Pi 5. Replacement with the WD Black SN7100 is approved and is the next step.
-- **Drop watch:** A check runs every 10 minutes for new NVMe controller-down events. It stays silent unless a new drop occurs. It continues until the drive is replaced.
+- **Affected store Pi:** All three low-cost fixes applied and verified, but drops recurred — 13 controller-down events in total through November 12, so the fixes did not hold. A health-gated watchdog now monitors it: the latest drop self-recovered with no reboot and no power cycle. The drive replacement plan is drafted and awaiting approval.
+- **Drop watch:** A check runs every 10 minutes for new NVMe controller-down events. It stays silent unless a new drop occurs.
 - **Control store Pi:** Healthy, zero drops. No action needed.
-- **Three offline Pis:** Still offline, no telemetry. Recovery is remote via PoE power-cycle (see Next steps); no site visit needed.
+- **Two offline Pis:** Still offline, no telemetry. Their site switches are unreachable from the UniFi controller, so remote power-cycling is blocked until controller connectivity returns.
 
 ## Next steps
 
-- **Replace the SN770 on the affected store Pi (approved November 11):** The low-cost fixes did not hold — four drops recurred after all three fixes. Replace the SN770 with a Pi 5-proven drive (the WD Black SN7100, as used at the control store).
-- **Three offline Pis:** Recover remotely via the UniFi monitor: detect the offline Pi, identify its switch port, power-cycle the PoE port, and confirm the Pi comes back online. No site visit needed — remote PoE power-cycle is why the Pis use PoE.
+- **Affected store Pi:** The low-cost fixes did not hold (13 drops through November 12). Replace the SN770 with a Pi 5-proven drive (the WD Black SN7100, as used at the control store); the replacement plan is drafted and awaiting approval. Until the swap, the health-gated watchdog handles drops automatically.
+- **Two offline Pis:** Restore controller connectivity to their site switches first; then recover remotely via the UniFi monitor: detect the offline Pi, identify its switch port, power-cycle the PoE port, and confirm the Pi comes back online. No site visit needed — remote PoE power-cycle is why the Pis use PoE.
 - **Second node at the affected store:** Confirm what the second node at the affected store is and whether it carries an SN770 (it is not a Pi and is outside the five-Pi scope, but the drive question matters).
-- **This page:** Updated as the drop watch verdict lands and as the offline Pis are recovered.
+- **This page:** Updated as the drive replacement lands and as the offline Pis are recovered.
 
 ## References
 
